@@ -18,7 +18,7 @@ meta <- fread("data/metadata/all_sra_metadata.csv")
 
 # dataset <- "delta"
 
-for(dataset in unique(meta$alias)) {
+morsels <- foreach(dataset = unique(meta$alias)) %do% {
   intra_agg <- fread(str_glue("results/allele_frequency_out/codon_out/{dataset}.csv")) %>%
     filter(ref_AA %in% possible_variants) %>%
     filter(var_AA %in% possible_variants)
@@ -41,141 +41,41 @@ for(dataset in unique(meta$alias)) {
     mutate(global_prop = replace_na(global_prop, 0)) %>%
     mutate(max_prop = replace_na(max_prop, 0)) %>%
     mutate(future_high = max_prop > 0.1) %>%
-    mutate(future_fixed = max_prop > 0.9) %>% 
+    mutate(future_fixed = max_prop > 0.9)
+  
+  # Count number of current mutations
+  n_current <- merged %>%
+    filter(mutation_name %in% current_agg$mutation_name) %>%
+    distinct(mutation_name) %>%
+    nrow()
+  
+  perc_current <- n_current / n_distinct(merged$mutation_name) * 100
+  
+  print(str_glue("{dataset}: current={n_current} ({perc_current}%)"))
+  
+  merged_filt <- merged %>%
     filter(!(mutation_name %in% current_agg$mutation_name)) # Remove mutations currently at high frequency
   
-  merged %>% 
+  merged_filt %>% 
     fwrite(str_glue("results/mutation_stats/{dataset}.stats.csv"),
            eol = "\n")
   
-  table(merged$future_fixed)
-  table(merged$future_high)
-}
-  # p1 <- merged %>%
-  #   ggplot(aes(y = log10(global_n + 1), x = max_freq)) +
-  #   geom_bin2d() +
-  #   scale_fill_viridis_c(trans = "log10") +
-  #   geom_smooth(method = "lm", color = "black", fill = "grey") +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "Max intrahost freq.", y = "Log10(no. GISAID sequences)",
-  #        fill = "No. mutations") 
-  # 
-  # p2 <- merged %>%
-  #   ggplot(aes(y = log10(global_n + 1), x = n)) +
-  #   geom_bin2d() +
-  #   scale_fill_viridis_c(trans = "log10") +
-  #   geom_smooth(method = "lm", color = "black", fill = "grey") +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "No. libraries detected", y = "Log10(no. GISAID sequences)",
-  #        fill = "No. mutations") 
-  # 
-  # p3 <- merged %>%
-  #   ggplot(aes(x = future_high, y = log10(max_freq))) +
-  #   geom_boxplot() +
-  #   geom_pwc() +
-  #   geom_boxplot(fill = "turquoise") +
-  #   geom_pwc() +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "Max. future frequency >10%", 
-  #        y = "Max. intrahost freq.")
-  # 
-  # p4 <- merged %>%
-  #   ggplot(aes(x = future_high, y = log10(n))) +
-  #   geom_boxplot(fill = "goldenrod") +
-  #   geom_pwc() +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "Max. future frequency >10%", 
-  #        y = "Log10(no. libaries detected)")
-  # 
-  # merged %>%
-  #   ggplot(aes(y = log10(global_n + 1), x = abs_charge)) +
-  #   geom_bin2d() +
-  #   scale_fill_viridis_c(trans = "log10") +
-  #   geom_smooth(method = "lm", color = "black", fill = "grey") +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "Abs. charge change", y = "Log10(no. GISAID sequences)",
-  #        fill = "No. mutations") 
-  # 
-  # merged %>%
-  #   ggplot(aes(y = log10(global_n + 1), x = abs_mw)) +
-  #   geom_bin2d() +
-  #   scale_fill_viridis_c(trans = "log10") +
-  #   geom_smooth(method = "lm", color = "black", fill = "grey") +
-  #   theme_bw() +
-  #   theme(legend.position = "top",
-  #         text = element_text(family = "sans"),
-  #         axis.title = element_text(face = "bold"),
-  #         legend.title = element_text(face = "bold")) +
-  #   labs(x = "Abs. charge change", y = "Log10(no. GISAID sequences)",
-  #        fill = "No. mutations") 
-  # 
-  # ggarrange(p1, p2, p3, p4, nrow = 1, align = "hv")
-  # 
-  # ggsave(str_glue("results/modelling_out/predictors.{dataset}.pdf"), 
-  #        width = 14, height = 4)
+  table(merged_filt$future_fixed)
+  table(merged_filt$future_high)
   
-#   # Linear model
-#   linreg <- lm(log10(global_n + 1) ~ n + max_freq + blosum62_score + abs_mw + abs_charge + abs_hydropathy, 
-#                data = merged)
-#   
-#   res <- summary(linreg)
-#   
-#   prop_var <- relaimpo::calc.relimp(linreg)$lmg * 100
-#   lin_res <- as.data.frame(coefficients(summary(linreg))) %>%
-#     rownames_to_column("predictor") %>%
-#     left_join(tibble(predictor = names(prop_var),
-#                      perc_var_expl = prop_var) %>%
-#                 arrange(desc(perc_var_expl))) %>%
-#     mutate_if(is.numeric, function(x) {signif(x, 2)}) %>%
-#     arrange(desc(perc_var_expl)) %>%
-#     bind_rows(tibble(predictor = "total", perc_var_expl = res$adj.r.squared))
-#   
-#   fwrite(lin_res, str_glue("results/modelling_out/modelling_stats/linreg.{dataset}.csv"))
-#   
-#   # Logistic regression
-#   logreg <- glm(future_high ~ log10(n) + max_freq + 
-#                   blosum62_score + abs_mw + abs_charge + abs_hydropathy,
-#                 data = merged,
-#                 family = "binomial")
-#   
-#   logreg_res <- summary(logreg)
-#   
-#   parsed_logreg_res <- as.data.frame(coef(logreg_res)) %>%
-#     mutate(OR = exp(Estimate)) %>%
-#     mutate(across(everything(), function(x){signif(x, 3)}))
-#   
-#   fwrite(parsed_logreg_res, str_glue("results/modelling_out/modelling_stats/logreg.{dataset}.csv"))
-#   
-#   # Analysis of deviance
-#   aod <- data.frame(anova(logreg))
-#   null_deviance <- aod["NULL", "Resid..Dev"]
-#   
-#   aod %>%
-#     dplyr::select(Deviance) %>%
-#     mutate(dev_explained = Deviance / null_deviance * 100) 
-#   
-#   (null_deviance - logreg$deviance) / null_deviance * 100
-#   
-#   exp(coefficients(logreg))
-# }
+  # Count n_high
+  n_high <- merged_filt %>%
+    filter(future_high) %>%
+    nrow()
+  perc_high <- n_high / nrow(merged_filt) * 100
+  
+  tibble(dataset = dataset,
+         n_high = n_high,
+         perc_high = perc_high,
+         n_current = n_current,
+         perc_current = perc_current,
+         n_total = nrow(merged),
+         n_filt = nrow(merged_filt))
+}
 
+bind_rows(morsels) %>% View()

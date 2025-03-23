@@ -33,9 +33,22 @@ pango_filter.R
 ## Calculate monthly SAV frequencies
 submit_monthly_freq_script.sbs
 calculate_monthly_frequencies.geo.crick.R # Split by region
-calculate_monthly_frequencies.V2.R  # All time
+calculate_monthly_frequencies.V2.crick.R  # All time
 
 ## Aggregate SAV fitness
 aggregate_monthly_prop.R
 aggregate_monthly_prop.all_time.R
 aggregate_monthly_prop.cross_dataset.R
+
+# Interhost linkage
+## Generate presence absence matrix of mutations for D' calculations
+split_gisaid_by_month.R
+generate_presence_matrix.V2.crick.R
+submit_generate.crick.sbs
+
+## Calculate D'
+calculate_Dprime.parallel.V2.crick.R
+submit_Dprime.crick.sbs
+
+
+

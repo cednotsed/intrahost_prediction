@@ -40,10 +40,12 @@ morsels <- foreach(exp = exp_list) %do% {
   plot_df <- res %>%
     left_join(stat_df)
   
+  rho <- signif(cor(plot_df$y_test, plot_df$y_pred, method = "spearman"), 2)
   r2 <- signif(1 - sum((plot_df$y_pred - plot_df$y_test)^2) / sum((plot_df$y_test - mean(plot_df$y_test))^2), 2)
   mae <- signif(mean(abs(plot_df$y_test - plot_df$y_pred)), 2)
   
   tibble(train = train, test = test,
+         rho = rho,
          r2 = r2,
          mae = mae)
 }

@@ -1,5 +1,5 @@
 rm(list = ls())
-setwd("c:/git_repos/early_SC2_trajectory/")
+setwd("c:/git_repos/intrahost_prediction/")
 require(tidyverse)
 require(data.table)
 require(Biostrings)
@@ -7,7 +7,7 @@ require(foreach)
 require(ggpubr)
 require(paletteer)
 
-file_dir <- "results/ML_out/shap_out/"
+file_dir <- "results/ML_out.020225/shap_out/"
 file_list <- list.files(file_dir, full.names = T)
 
 morsels <- foreach(file_name = file_list) %do% {
@@ -19,8 +19,7 @@ morsels <- foreach(file_name = file_list) %do% {
 }
 
 merged <- bind_rows(morsels) %>%
-  filter(grepl("spike", alias)) %>%
-  filter(!grepl("_to_", alias)) %>%
+  filter(!grepl("_to_|spike|partition|max", alias)) %>%
   select(contains("shap"), alias) %>%
   pivot_longer(!alias, names_to = "predictor", values_to = "shap") %>%
   filter(!is.na(shap))
@@ -47,6 +46,6 @@ merged %>%
         axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Predictor", y = "Abs. SHAP values")
 
-ggsave("results/ML_out/predictor_importance.pdf", dpi = 600, width = 4.5, height = 3)
+ggsave("results/prediction_out/predictor_importance.pdf", dpi = 600, width = 4.5, height = 3)
   
   

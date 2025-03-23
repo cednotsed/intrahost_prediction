@@ -76,3 +76,7 @@ ggarrange(plt1, plt2, nrow = 2,
 ggsave("results/prediction_out/average_time_to_success.tonkin.pdf", dpi = 600, width = 8, height = 10)
 
 
+first_df %>%
+  filter(month_diff > 0) %>%
+  filter(n > 1) %>%
+  nrow()

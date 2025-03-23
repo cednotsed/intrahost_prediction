@@ -1,5 +1,5 @@
 rm(list = ls())
-setwd("c:/git_repos/early_SC2_trajectory/")
+setwd("c:/git_repos/intrahost_prediction/")
 require(tidyverse)
 require(data.table)
 require(Biostrings)
@@ -7,7 +7,7 @@ require(foreach)
 require(ggpubr)
 require(paletteer)
 
-file_dir <- "results/ML_out/shap_out/"
+file_dir <- "results/ML_out.020225/shap_out/"
 file_list <- list.files(file_dir, full.names = T)
 
 morsels <- foreach(file_name = file_list) %do% {
@@ -21,8 +21,7 @@ morsels <- foreach(file_name = file_list) %do% {
 set.seed(66)
 
 merged <- bind_rows(morsels) %>%
-  filter(!grepl("_to_|linkage", alias)) %>%
-  filter(grepl("spike", alias)) %>%
+  filter(!grepl("_to_|linkage|prime|max|spike|tonkin", alias)) %>%
   # group_by(alias) %>%
   # sample_n(50, replace = F) %>%
   ungroup()
@@ -39,6 +38,11 @@ value_df <- merged %>%
 plot_df <- shap_df %>%
   bind_cols(value_df %>% select(value)) %>%
   filter(!is.na(shap))
+
+median_df <- plot_df %>%
+  group_by(predictor) %>%
+  summarise(importance = median(sum(abs(shap)))) %>%
+  arrange(desc(importance))
 
 plot_df %>%
   summarise(n_distinct(predictor),
@@ -61,14 +65,10 @@ foreach(pred = preds) %do% {
       filter(value != -1)
   }
   
-  crumbs <- foreach(d = c("early.spike", "alpha.spike", "delta.spike", "ba1.spike", "ba5.spike", "xbb.spike", "pirola.spike")) %do% {
+  crumbs <- foreach(d = c("early", "alpha", "delta", "ba1", "ba5", "xbb", "pirola")) %do% {
     i <- i + 1
     temp2 <- temp1 %>%
       filter(alias == d)
-    
-    median_value <- deframe(temp2 %>%
-                              ungroup() %>%
-                              summarise((min(value) + max(value)) / 2))
     
     plt <- temp2 %>%
       # sample_n(500, replace = F) %>%
@@ -83,14 +83,14 @@ foreach(pred = preds) %do% {
                   data = temp2,
                   size = 2) +
       theme_bw() +
-      # theme(axis.text = element_blank(),
-      #       axis.title = element_blank(),
-      #       axis.ticks = element_blank(),
-      #       panel.grid = element_blank(),
-      #       legend.position = "none")
-      theme(text = element_text(family = "sans"),
-            axis.title = element_text(face = "bold"),
+      theme(axis.text = element_blank(),
+            axis.title = element_blank(),
+            axis.ticks = element_blank(),
+            panel.grid = element_blank(),
             legend.position = "none") +
+      # theme(text = element_text(family = "sans"),
+      #       axis.title = element_text(face = "bold"),
+      #       legend.position = "none") +
       labs(x = pred, y = "SHAP value", title = d)
     
     plot_list <- c(plot_list, list(plt))
@@ -101,15 +101,15 @@ foreach(pred = preds) %do% {
 }
 
 merged_plt <- ggarrange(plotlist = plot_list, align = "hv", ncol = 7, nrow = 13)
-# ggsave("results/ML_out/all_predictor_relationships.png", plot = merged_plt, height = 20, width = 20)
-ggsave("results/ML_out/all_predictor_relationships.with_labels.png", plot = merged_plt, height = 20, width = 20)
+ggsave("results/ML_out/all_predictor_relationships.png", plot = merged_plt, height = 20, width = 20)
+ggsave("results/ML_out.020225/all_predictor_relationships.with_labels.png", plot = merged_plt, height = 20, width = 20)
 
 
 pred_list <- rev(c("max_freq", "delta_hydropathy", "blosum62_score", "delta_bind"))
 
 plot_list2 <- foreach(pred = pred_list) %do% {
   plot_df %>%
-    filter(alias == "delta.spike") %>%
+    filter(alias == "delta") %>%
     filter(predictor == pred) %>%
     filter(value != -100) %>%
     ggplot(aes(x = value, y = shap)) +
@@ -123,5 +123,6 @@ plot_list2 <- foreach(pred = pred_list) %do% {
     labs(x = pred, y = "SHAP value")
 }
 
-ggarrange(plotlist = plot_list2, align = "hv", nrow = 1)
-ggsave("results/ML_out/predictors_of_interest.pdf", height = 3, width = 12)
+ggarrange(plotlist = rev(plot_list2), align = "hv", nrow = 1)
+
+ggsave("results/ML_out.020225/predictors_relationships_of_interest.pdf", height = 3, width = 12)

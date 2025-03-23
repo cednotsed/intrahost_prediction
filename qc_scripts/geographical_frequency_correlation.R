@@ -58,7 +58,7 @@ overall_morsels <- foreach(idx = seq(ncol(pairs))) %do% {
 
 combined <- ggarrange(plotlist = overall_morsels, nrow = 3, ncol = 5)
 
-ggsave("results/qc_out/geographical_correlation.overall.png", dpi = 300, width = 10, height = 5)
+ggsave("results/qc_out/geographical_correlation.overall.png", plot = combined, dpi = 600, width = 10, height = 5)
 
 
 # merged <- df1 %>%

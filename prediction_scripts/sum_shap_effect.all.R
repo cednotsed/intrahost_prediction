@@ -1,5 +1,5 @@
 rm(list = ls())
-setwd("c:/git_repos/early_SC2_trajectory/")
+setwd("c:/git_repos/intrahost_prediction/")
 require(tidyverse)
 require(data.table)
 require(Biostrings)

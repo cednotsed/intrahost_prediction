@@ -1,5 +1,5 @@
 rm(list = ls())
-setwd("c:/git_repos/early_SC2_trajectory/")
+setwd("c:/git_repos/intrahost_prediction/")
 require(tidyverse)
 require(data.table)
 require(Biostrings)
@@ -91,7 +91,7 @@ combined %>%
         axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Time period", y = "Pearson's r")
 
-ggsave("results/qc_out/geographical_correlation.by_time.png", dpi = 300, width = 10, height = 5)
+ggsave("results/qc_out/geographical_correlation.by_time.pdf", dpi = 300, width = 10, height = 5)
 
 
 # merged <- df1 %>%
