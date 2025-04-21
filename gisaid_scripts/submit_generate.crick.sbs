@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --time=48:00:00
+#SBATCH --mem=100G
+#SBATCH --partition=ncpu
+#SBATCH --output=/flask/scratch/matthewsp/intrahost_prediction/gisaid_scripts/logs/generate_%A_%a.log
+#SBATCH --array=1-4267
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate r_env
+
+Rscript generate_presence_matrix.V2.crick.R $SLURM_ARRAY_TASK_ID
+
