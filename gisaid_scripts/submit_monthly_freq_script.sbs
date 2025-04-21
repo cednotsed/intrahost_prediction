@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --time=48:00:00
+#SBATCH --mem-per-cpu=50G
+#SBATCH --partition=ncpu
+#SBATCH --array=1-56
+#SBATCH --output=/flask/scratch/matthewsp/early_SC2_trajectory/gisaid_scripts/logs/calc_%A_%a.log
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate r_env
+
+Rscript --vanilla calculate_monthly_frequencies.V2.crick.R $SLURM_ARRAY_TASK_ID
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID africa
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID oceania
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID asia
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID north_america
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID south_america
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID US_only
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID non_US
+#Rscript --vanilla calculate_monthly_frequencies.geo.crick.R $SLURM_ARRAY_TASK_ID europe
+
