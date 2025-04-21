@@ -1,3 +1,11 @@
+# Intrahost dynamics, together with genetic and phenotypic effects predict the success of viral mutations
+Cedric CS Tan, Marina Escalera-Zamudio, Alexei Yavlinsky, Lucy van Dorp, Francois Balloux
+
+BioRXiv: [https://doi.org/10.1101/2024.10.18.619070](https://doi.org/10.1101/2024.10.18.619070)
+Source data: [Zenodo](https://doi.org/10.5281/zenodo.15255016)
+
+<img src="git_figures/selection_diagram.png" alt="Intrahost diversity predicts mutational fitness" width="700" height="600">
+
 # Order of scripts
 
 ## Metadata parsing
