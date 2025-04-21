@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --time=48:00:00
+#SBATCH --mem=32G
+#SBATCH --array=1-7
+#SBATCH --partition=ncpu
+#SBATCH --output=/flask/scratch/matthewsp/intrahost_prediction/ML_scripts/logs/within_dprime_%A_%a.log
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate mashin
+
+# Within datasets
+config_file=datasets.txt
+dataset=$(head -n $SLURM_ARRAY_TASK_ID $config_file|tail -n 1)
+#python regression.transition.py $dataset
+#python regression.transition.max_freq_only.py $dataset
+#python regression.transition.spike.py $dataset
+python regression.transition.partition.dprime_only.py $dataset
+#python regression.transition.max_future_prop.py $dataset
+
+# Cross datasets
+#config_file=cross_datasets.csv
+#dataset=$(head -n $SLURM_ARRAY_TASK_ID $config_file|tail -n 1)
+#train=$(echo $dataset|cut -d',' -f1)
+#test=$(echo $dataset|cut -d',' -f2)
+#python regression.cross_dataset.py $train $test
+#python regression.cross_dataset.partition.dprime_only.py $train $test

@@ -1,0 +1,6 @@
+alpha_to_ba1,ba1_to_end
+alpha_to_delta,delta_to_ba1
+ba1_to_ba5,ba5_to_xbb
+ba1_to_xbb,xbb_to_end
+#early_to_delta.non_US,ba1_to_end.US_only
+#tonkin_to_delta,ba1_to_end.US_only
