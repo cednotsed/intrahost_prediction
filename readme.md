@@ -8,7 +8,7 @@ Source data: [Zenodo](https://doi.org/10.5281/zenodo.15255016)
 
 # Order of scripts
 
-## Metadata parsing
+## 1. Metadata parsing
 ### Parse BioSample metadata
 [parse_ncbi_biosample_xml_to_csv.full.ipynb](download_scripts/parse_ncbi_biosample_xml_to_csv.full.ipynb)
 
@@ -23,7 +23,7 @@ Source data: [Zenodo](https://doi.org/10.5281/zenodo.15255016)
 
 [merge_early_and_transition_metadata.R](download_scripts/merge_early_and_transition_metadata.R)
 
-## Bioinfo pipeline
+## 2. Bioinfo pipeline
 ### Process samples
 [consensus_pipeline.V3.transition.sbs](pipeline_scripts/consensus_pipeline.V3.transition.sbs)
 
@@ -46,7 +46,7 @@ Source data: [Zenodo](https://doi.org/10.5281/zenodo.15255016)
 
 [pango_filter.R](qc_scripts/pango_filter.R)
 
-## GISAID data
+## 3. GISAID data
 ### Calculate monthly SAV frequencies
 Split by region: [calculate_monthly_frequencies.geo.crick.R](gisaid_scripts/calculate_monthly_frequencies.geo.crick.R) 
 
@@ -60,7 +60,7 @@ For each cross-dataset timeframe [aggregate_monthly_prop.cross_dataset.R](gisaid
 Across all time: [aggregate_monthly_prop.all_time.R](gisaid_scripts/aggregate_monthly_prop.all_time.R)
 
 
-## Interhost linkage
+## 4. Linkage
 ### Generate presence absence matrix of mutations for D' calculations
 [split_gisaid_by_month.R](gisaid_scripts/split_gisaid_by_month.R)
 
@@ -68,7 +68,7 @@ Across all time: [aggregate_monthly_prop.all_time.R](gisaid_scripts/aggregate_mo
 
 [submit_generate.crick.sbs](gisaid_scripts/submit_generate.crick.sbs)
 
-### Calculate D'
+### Calculate D' (interhost linkage)
 Before each timeframe: [calculate_Dprime.before.parallel.V2.crick.R](linkage_scripts/calculate_Dprime.before.parallel.V2.crick.R)
 
 After each timeframe: [calculate_Dprime.after.parallel.V2.crick.R](linkage_scripts/calculate_Dprime.after.parallel.V2.crick.R)
@@ -77,7 +77,10 @@ Across all time: [calculate_Dprime.before.parallel.V2.crick.R](linkage_scripts/c
 
 [submit_Dprime.crick.sbs](linkage_scripts/submit_Dprime.crick.sbs)
 
-## Machine learning models
+### Intrahost linkage
+[calculate_allele_correlation.V2.with_zeroes.all.R](linkage_scripts/calculate_allele_correlation.V2.with_zeroes.all.R)
+
+## 5. Machine learning models
 ### Generate datasets for models
 [generate_mutation_stats.all.R](intrahost_scripts/generate_mutation_stats.all.R)
 
@@ -105,7 +108,7 @@ Physiochemical+phenotypic+intrahost+partition+linkage predictors: [regression.tr
 
 Physiochemical+phenotypic+intrahost predictors (Spike SAVs only): [regression.cross_dataset.spike.py](ML_scripts/regression.cross_dataset.spike.py)
 
-### Model evaluation
+## 6. Model evaluation
 Single-timeframe Nested CV results: [visualise_ML_results.all.R](ML_scripts/visualise_ML_results.all.R)
 
 Cross-country results: [cross_country_results.R](ML_scripts/cross_country_results.R)
@@ -118,7 +121,7 @@ Model performance with or without linkage predictors (cross-dataset): [linkage_v
 
 Model performance when using different fitness estimates: [num_genomes_vs_max_prop.R](ML_scripts/num_genomes_vs_max_prop.R)
 
-### SHAP and mutation subset analysis
+## 7. SHAP and mutation subset analysis
 Relationships between predictors and response: [visualise_predictor_relationships.R](ML_scripts/visualise_predictor_relationships.R)
 
 Relative importance of predictors: [visualise_relative_importance.R](ML_scripts/visualise_relative_importance.R)
